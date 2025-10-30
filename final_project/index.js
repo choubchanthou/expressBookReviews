@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const session = require("express-session");
 const customer_routes = require("./router/auth_users.js").authenticated;
 const genl_routes = require("./router/general.js").general;
+const public_users = require("./router/public_users");
 
 const app = express();
 
@@ -38,7 +39,9 @@ app.use("/customer/auth/*", function auth(req, res, next) {
     }
 
     // Verify token
-    const decoded = jwt.verify(token, "fingerprint_customer", { algorithms: ["HS256"] });
+    const decoded = jwt.verify(token, "fingerprint_customer", {
+      algorithms: ["HS256"],
+    });
     // Attach claims to request for downstream handlers
     req.user = decoded; // e.g., { sub: userId, email, role, iat, exp }
     return next();
@@ -51,6 +54,10 @@ app.use("/customer/auth/*", function auth(req, res, next) {
 const PORT = 5000;
 
 app.use("/customer", customer_routes);
+app.use("/public", public_users);
 app.use("/", genl_routes);
+
+
+
 
 app.listen(PORT, () => console.log("Server is running"));
